@@ -127,6 +127,11 @@ public class MainActivity extends AppCompatActivity {
                 .url("https://api.spotify.com/v1/me")
                 .addHeader("Authorization", "Bearer " + mAccessToken)
                 .build();
+        // request for top artists or tracks
+        //final Request request = new Request.Builder()
+        //        .url("https://api.spotify.com/v1/me/top/{type}") //for {type}, replace with artists or tracks
+        //        .addHeader("Authorization", "Bearer " + mAccessToken)
+        //        .build();
 
         cancelCall();
         mCall = mOkHttpClient.newCall(request);
@@ -177,6 +182,19 @@ public class MainActivity extends AppCompatActivity {
                 .setCampaign("your-campaign-token")
                 .build();
     }
+    /**
+     * Get authentication request for top items of a user
+     *
+     * @param type the type of the request
+     * @return the authentication request
+     */
+    //private AuthorizationRequest getAuthenticationRequest(AuthorizationResponse.Type type) {
+    //    return new AuthorizationRequest.Builder(CLIENT_ID, type, getRedirectUri().toString())
+    //            .setShowDialog(false)
+    //            .setScopes(new String[] { "user-top-read" }) // <--- Scope for token to read top artists or songs
+    //            .setCampaign("your-campaign-token")
+    //            .build();
+    //}
 
     /**
      * Gets the redirect Uri for Spotify
