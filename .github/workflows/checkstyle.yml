@@ -1,0 +1,11 @@
+on:
+  pull_request:
+    branches:
+    - main
+
+jobs:
+  my_job:
+    name: checkstyle
+    runs-on: ubuntu-latest
+    steps:
+    - run: java -jar ./checkstyle/checkstyle-6.18-all.jar -c ./checkstyle/CS1332-checkstyle.xml ./src/main/java/com/example/spotivy_app/*.java
