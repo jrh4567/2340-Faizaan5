@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".LoginActivity">
+    tools:context=".RegisterActivity">
 
     <EditText
         android:id="@+id/usernameEditText"
@@ -23,23 +23,12 @@
         android:inputType="textPassword" />
 
     <Button
-        android:id="@+id/loginButton"
+        android:id="@+id/registerButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/passwordEditText"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
-        android:text="Login" />
-
-    <TextView
-        android:id="@+id/registerTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/loginButton"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
-        android:text="Don't have an account? Register here"
-        android:clickable="true"
-        android:onClick="onRegisterClicked"/>
+        android:text="Register" />
 
 </RelativeLayout>

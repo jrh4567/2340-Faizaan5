@@ -6,8 +6,8 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.spotify_app.MainActivity;
@@ -39,6 +39,16 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+
+        TextView registerTextView = findViewById(R.id.registerTextView);
+        registerTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Start the RegisterActivity when the "Register" TextView is clicked
+                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private boolean authenticateUser() {
@@ -48,5 +58,11 @@ public class LoginActivity extends AppCompatActivity {
         String password = passwordEditText.getText().toString().trim();
 
         return !TextUtils.isEmpty(username) && !TextUtils.isEmpty(password);
+    }
+
+    // This method is called when the "Register" TextView is clicked
+    public void onRegisterClicked(View view) {
+        Intent intent = new Intent(this, RegisterActivity.class);
+        startActivity(intent);
     }
 }
