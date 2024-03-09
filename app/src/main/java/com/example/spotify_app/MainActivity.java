@@ -13,10 +13,13 @@ import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -145,16 +148,87 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
+            //public void onResponse(Call call, Response response) throws IOException {
+            //    try {
+            //        final JSONObject jsonObject = new JSONObject(response.body().string());
+            //        setTextAsync(jsonObject.toString(3), profileTextView);
+            //    } catch (JSONException e) {
+            //        Log.d("JSON", "Failed to parse data: " + e);
+            //        Toast.makeText(MainActivity.this, "Failed to parse data, watch Logcat for more details",
+            //                Toast.LENGTH_SHORT).show();
+            //    }
+            //}
             public void onResponse(Call call, Response response) throws IOException {
                 try {
+                    // Extract JSON response
                     final JSONObject jsonObject = new JSONObject(response.body().string());
-                    setTextAsync(jsonObject.toString(3), profileTextView);
+
+                    // Parse JSON and store data
+                    List<Artist> artists = parseArtists(jsonObject); //assuming api call is for top artists
+
+                    // Update UI with parsed data
+                    StringBuilder builder = new StringBuilder();
+                    for (Artist artist : artists) {
+                        builder.append(artist.toString()).append("\n");
+                    }
+                    final String artistsData = builder.toString();
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            profileTextView.setText(artistsData);
+                        }
+                    });
+
                 } catch (JSONException e) {
                     Log.d("JSON", "Failed to parse data: " + e);
                     Toast.makeText(MainActivity.this, "Failed to parse data, watch Logcat for more details",
                             Toast.LENGTH_SHORT).show();
                 }
             }
+
+            // Function to parse artists from JSON response
+            private List<Artist> parseArtists(JSONObject jsonObject) throws JSONException {
+                List<Artist> artists = new ArrayList<>();
+
+                // Extract relevant information from JSON response and create Artist objects
+                JSONArray items = jsonObject.getJSONArray("items");
+                for (int i = 0; i < items.length(); i++) {
+                    JSONObject item = items.getJSONObject(i);
+                    String name = item.getString("name");
+                    JSONArray genresArray = item.getJSONArray("genres");
+                    List<String> genres = new ArrayList<>();
+                    for (int j = 0; j < genresArray.length(); j++) {
+                        genres.add(genresArray.getString(j));
+                    }
+                    int popularity = item.getInt("popularity");
+
+                    // Create Artist object and add it to the list
+                    Artist artist = new Artist(name, genres, popularity);
+                    artists.add(artist);
+                }
+
+                return artists;
+            }
+
+            // Define Artist class to store artist information, can extract if needed to another file for readability
+            class Artist {
+                private String name;
+                private List<String> genres;
+                private int popularity;
+
+                public Artist(String name, List<String> genres, int popularity) {
+                    this.name = name;
+                    this.genres = genres;
+                    this.popularity = popularity;
+                }
+
+                @Override
+                public String toString() {
+                    return "Name: " + name + ", Genres: " + genres + ", Popularity: " + popularity;
+                }
+            }
+
         });
     }
 
