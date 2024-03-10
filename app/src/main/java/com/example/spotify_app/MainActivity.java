@@ -30,7 +30,7 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity {
 
     public static final String CLIENT_ID = "629459785f9d4452a9f57b9d71adc085";
-    public static final String REDIRECT_URI = "Spotify-App://auth";
+    public static final String REDIRECT_URI = "spotify-app://auth";
 
     public static final int AUTH_TOKEN_REQUEST_CODE = 0;
     public static final int AUTH_CODE_REQUEST_CODE = 1;
@@ -126,18 +126,18 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Create a request to get the user profile
-        final Request request = new Request.Builder()
+        final Request requestProfile = new Request.Builder()
                 .url("https://api.spotify.com/v1/me")
                 .addHeader("Authorization", "Bearer " + mAccessToken)
                 .build();
         // request for top artists or tracks
-        //final Request request = new Request.Builder()
-        //        .url("https://api.spotify.com/v1/me/top/{type}") //for {type}, replace with artists or tracks, for more options such as time range, go to https://developer.spotify.com/documentation/web-api/reference/get-users-top-artists-and-tracks
-        //        .addHeader("Authorization", "Bearer " + mAccessToken)
-        //        .build();
+        final Request requestArtists = new Request.Builder()
+                .url("https://api.spotify.com/v1/me/top/artists") //for {type}, replace with artists or tracks, for more options such as time range, go to https://developer.spotify.com/documentation/web-api/reference/get-users-top-artists-and-tracks
+                .addHeader("Authorization", "Bearer " + mAccessToken)
+                .build();
 
         cancelCall();
-        mCall = mOkHttpClient.newCall(request);
+        mCall = mOkHttpClient.newCall(requestProfile);
 
         mCall.enqueue(new Callback() {
             @Override
@@ -148,43 +148,70 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            //public void onResponse(Call call, Response response) throws IOException {
-            //    try {
-            //        final JSONObject jsonObject = new JSONObject(response.body().string());
-            //        setTextAsync(jsonObject.toString(3), profileTextView);
-            //    } catch (JSONException e) {
-            //        Log.d("JSON", "Failed to parse data: " + e);
-            //        Toast.makeText(MainActivity.this, "Failed to parse data, watch Logcat for more details",
-            //                Toast.LENGTH_SHORT).show();
-            //    }
-            //}
             public void onResponse(Call call, Response response) throws IOException {
                 try {
-                    // Extract JSON response
-                    final JSONObject jsonObject = new JSONObject(response.body().string());
-
-                    // Parse JSON and store data
-                    List<Artist> artists = parseArtists(jsonObject); //assuming api call is for top artists
-
-                    // Update UI with parsed data
-                    StringBuilder builder = new StringBuilder();
-                    for (Artist artist : artists) {
-                        builder.append(artist.toString()).append("\n");
-                    }
-                    final String artistsData = builder.toString();
+                    // Extract JSON response for user profile
+                    final JSONObject profileJsonObject = new JSONObject(response.body().string());
 
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            profileTextView.setText(artistsData);
+                            // Update UI with user profile data
+                            profileTextView.setText(profileJsonObject.toString());
+
+                            // Make a second request to get the top artists
+                            makeTopArtistsRequest(requestArtists);
                         }
                     });
 
                 } catch (JSONException e) {
-                    Log.d("JSON", "Failed to parse data: " + e);
-                    Toast.makeText(MainActivity.this, "Failed to parse data, watch Logcat for more details",
+                    Log.d("JSON", "Failed to parse user profile data: " + e);
+                    Toast.makeText(MainActivity.this, "Failed to parse user profile data, watch Logcat for more details",
                             Toast.LENGTH_SHORT).show();
                 }
+            }
+            // Method to make a request to get top artists
+            private void makeTopArtistsRequest(Request request) {
+                mCall = mOkHttpClient.newCall(request);
+
+                mCall.enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        Log.d("HTTP", "Failed to fetch top artists data: " + e);
+                        Toast.makeText(MainActivity.this, "Failed to fetch top artists data, watch Logcat for more details",
+                                Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        try {
+                            // Extract JSON response for top artists
+                            final JSONObject topArtistsJsonObject = new JSONObject(response.body().string());
+
+                            // Parse JSON for top artists
+                            List<Artist> artists = parseArtists(topArtistsJsonObject);
+
+                            // Update UI with top artists data
+                            StringBuilder builder = new StringBuilder("Top Artists:\n");
+                            for (Artist artist : artists) {
+                                builder.append(artist.toString()).append("\n");
+                            }
+                            final String topArtistsData = builder.toString();
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    profileTextView.append("\n\n" + topArtistsData);
+                                }
+                            });
+
+                        } catch (JSONException e) {
+                            Log.d("JSON", "Failed to parse top artists data: " + e);
+                            Toast.makeText(MainActivity.this, "Failed to parse top artists data, watch Logcat for more details",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
             }
 
             // Function to parse artists from JSON response
@@ -252,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
     private AuthorizationRequest getAuthenticationRequest(AuthorizationResponse.Type type) {
         return new AuthorizationRequest.Builder(CLIENT_ID, type, getRedirectUri().toString())
                 .setShowDialog(false)
-                .setScopes(new String[] { "user-read-email" }) // <--- Change the scope of your requested token here
+                .setScopes(new String[] { "user-read-email", "user-top-read" }) // <--- Change the scope of your requested token here
                 .setCampaign("your-campaign-token")
                 .build();
     }

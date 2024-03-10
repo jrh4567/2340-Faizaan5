@@ -15,6 +15,9 @@
         <activity
             android:name=".MainActivity"
             android:exported="true">
+            <intent-filter>
+                <data android:host="auth" android:scheme="spotify-app"/>
+            </intent-filter>
 
         </activity>
         <activity
