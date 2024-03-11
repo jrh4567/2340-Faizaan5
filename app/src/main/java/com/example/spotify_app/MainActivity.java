@@ -39,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
     private String mAccessToken, mAccessCode;
     private Call mCall;
 
-    private TextView tokenTextView, codeTextView, profileTextView;
+    private TextView tokenTextView, codeTextView, profileTextView, recTextView;
+    private String topArtist;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
         tokenTextView = (TextView) findViewById(R.id.token_text_view);
         codeTextView = (TextView) findViewById(R.id.code_text_view);
         profileTextView = (TextView) findViewById(R.id.response_text_view);
+        recTextView = (TextView) findViewById(R.id.recommend_text_view);
 
         // Initialize the buttons
         Button tokenBtn = (Button) findViewById(R.id.token_btn);
@@ -189,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
                             final JSONObject topArtistsJsonObject = new JSONObject(response.body().string());
 
                             // Parse JSON for top artists
-                            List<Artist> artists = parseArtists(topArtistsJsonObject);
+                            List<Artist> artists = parseArtists(topArtistsJsonObject, "items");
 
                             // Update UI with top artists data
                             StringBuilder builder = new StringBuilder("Top Artists:\n");
@@ -197,13 +199,18 @@ public class MainActivity extends AppCompatActivity {
                                 builder.append(artist.toString()).append("\n");
                             }
                             final String topArtistsData = builder.toString();
-
+                            final Request requestRecommended = new Request.Builder()
+                                    .url("https://api.spotify.com/v1/artists/"+ topArtist + "/related-artists")
+                                    .addHeader("Authorization", "Bearer " + mAccessToken)
+                                    .build();
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
                                     profileTextView.append("\n\n" + topArtistsData);
+                                    makeRecRequest(requestRecommended);
                                 }
                             });
+
 
                         } catch (JSONException e) {
                             Log.d("JSON", "Failed to parse top artists data: " + e);
@@ -213,10 +220,48 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             }
+            private void makeRecRequest(Request request) {
+                mCall = mOkHttpClient.newCall(request);
 
-            private List<Artist> parseArtists(JSONObject jsonObject) throws JSONException {
+                mCall.enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        Log.d("HTTP", "Failed to fetch recommended artists data: " + e);
+                        Toast.makeText(MainActivity.this, "Failed to fetch recommended artists data, watch Logcat for more details",
+                                Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        try {
+                            // Extract JSON response for top artists
+                            final JSONObject topArtistsJsonObject = new JSONObject(response.body().string());
+
+                            // Parse JSON for top artists
+                            List<Artist> artists = parseArtists(topArtistsJsonObject, "artists");
+
+                            // Update UI with top artists data
+                            StringBuilder builder = new StringBuilder("Recommended Artists:\n");
+                            for (Artist artist : artists) {
+                                builder.append(artist.toString()).append("\n");
+                            }
+                            final String topArtistsData = builder.toString();
+
+                            setTextAsync(topArtistsData, recTextView);
+
+
+                        } catch (JSONException e) {
+                            Log.d("JSON", "Failed to parse recommended artists data: " + e);
+                            Toast.makeText(MainActivity.this, "Failed to parse recommended artists data, watch Logcat for more details",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+
+            private List<Artist> parseArtists(JSONObject jsonObject, String val) throws JSONException {
                 List<Artist> artists = new ArrayList<>();
-                JSONArray items = jsonObject.getJSONArray("items");
+                JSONArray items = jsonObject.getJSONArray(val);
 
                 for (int i = 0; i < items.length(); i++) {
                     JSONObject item = items.getJSONObject(i);
@@ -228,6 +273,9 @@ public class MainActivity extends AppCompatActivity {
                     }
                     int popularity = item.getInt("popularity");
                     String spotifyId = item.getString("id");
+                    if (i == 0) {
+                        topArtist = item.getString("id");
+                    }
                     JSONArray imagesArray = item.getJSONArray("images");
                     List<String> images = new ArrayList<>();
                     for (int j = 0; j < imagesArray.length(); j++) {
