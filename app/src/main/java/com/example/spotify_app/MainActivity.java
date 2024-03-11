@@ -214,12 +214,10 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
 
-            // Function to parse artists from JSON response
             private List<Artist> parseArtists(JSONObject jsonObject) throws JSONException {
                 List<Artist> artists = new ArrayList<>();
-
-                // Extract relevant information from JSON response and create Artist objects
                 JSONArray items = jsonObject.getJSONArray("items");
+
                 for (int i = 0; i < items.length(); i++) {
                     JSONObject item = items.getJSONObject(i);
                     String name = item.getString("name");
@@ -229,30 +227,39 @@ public class MainActivity extends AppCompatActivity {
                         genres.add(genresArray.getString(j));
                     }
                     int popularity = item.getInt("popularity");
+                    String spotifyId = item.getString("id");
+                    JSONArray imagesArray = item.getJSONArray("images");
+                    List<String> images = new ArrayList<>();
+                    for (int j = 0; j < imagesArray.length(); j++) {
+                        JSONObject imageObject = imagesArray.getJSONObject(j);
+                        images.add(imageObject.getString("url"));
+                    }
 
-                    // Create Artist object and add it to the list
-                    Artist artist = new Artist(name, genres, popularity);
+                    Artist artist = new Artist(name, genres, popularity, spotifyId, images);
                     artists.add(artist);
                 }
 
                 return artists;
             }
 
-            // Define Artist class to store artist information, can extract if needed to another file for readability
             class Artist {
                 private String name;
                 private List<String> genres;
                 private int popularity;
+                private String spotifyId;
+                private List<String> images;
 
-                public Artist(String name, List<String> genres, int popularity) {
+                public Artist(String name, List<String> genres, int popularity, String spotifyId, List<String> images) {
                     this.name = name;
                     this.genres = genres;
                     this.popularity = popularity;
+                    this.spotifyId = spotifyId;
+                    this.images = images;
                 }
 
                 @Override
                 public String toString() {
-                    return "Name: " + name + ", Genres: " + genres + ", Popularity: " + popularity;
+                    return "Name: " + name + ", Genres: " + genres + ", Popularity: " + popularity + ", Spotify ID: " + spotifyId + ", Images: " + images;
                 }
             }
 
