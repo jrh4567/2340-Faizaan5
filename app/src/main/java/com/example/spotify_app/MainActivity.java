@@ -296,7 +296,8 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     Artist artist = new Artist(name, genres, popularity, spotifyId, images);
-                    artists.add(artist);
+                    artists.add(artist);h
+                    cnt++;
                 }
 
                 return artists;
