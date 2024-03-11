@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView tokenTextView, codeTextView, profileTextView, recTextView;
     private String topArtist;
+    private ArrayList<String> topArtists = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -191,7 +192,7 @@ public class MainActivity extends AppCompatActivity {
                             final JSONObject topArtistsJsonObject = new JSONObject(response.body().string());
 
                             // Parse JSON for top artists
-                            List<Artist> artists = parseArtists(topArtistsJsonObject, "items");
+                            List<Artist> artists = parseArtists(topArtistsJsonObject, "items", false);
 
                             // Update UI with top artists data
                             StringBuilder builder = new StringBuilder("Top Artists:\n");
@@ -238,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
                             final JSONObject topArtistsJsonObject = new JSONObject(response.body().string());
 
                             // Parse JSON for top artists
-                            List<Artist> artists = parseArtists(topArtistsJsonObject, "artists");
+                            List<Artist> artists = parseArtists(topArtistsJsonObject, "artists", true);
 
                             // Update UI with top artists data
                             StringBuilder builder = new StringBuilder("Recommended Artists:\n");
@@ -259,11 +260,15 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
 
-            private List<Artist> parseArtists(JSONObject jsonObject, String val) throws JSONException {
+            private List<Artist> parseArtists(JSONObject jsonObject, String val, Boolean limit) throws JSONException {
                 List<Artist> artists = new ArrayList<>();
                 JSONArray items = jsonObject.getJSONArray(val);
+                Integer cnt = 0;
 
                 for (int i = 0; i < items.length(); i++) {
+                    if (limit && cnt == 10) {
+                        break;
+                    }
                     JSONObject item = items.getJSONObject(i);
                     String name = item.getString("name");
                     JSONArray genresArray = item.getJSONArray("genres");
@@ -275,6 +280,13 @@ public class MainActivity extends AppCompatActivity {
                     String spotifyId = item.getString("id");
                     if (i == 0) {
                         topArtist = item.getString("id");
+                    }
+                    if (!limit) {
+                        topArtists.add(spotifyId);
+                    } else {
+                        if (topArtists.contains(spotifyId)) {
+                            continue;
+                        }
                     }
                     JSONArray imagesArray = item.getJSONArray("images");
                     List<String> images = new ArrayList<>();
