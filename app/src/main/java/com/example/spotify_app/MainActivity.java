@@ -261,9 +261,13 @@ public class MainActivity extends AppCompatActivity {
             }
 
             private List<Artist> parseArtists(JSONObject jsonObject, String val, Boolean limit) throws JSONException {
+                if (!limit) {
+                    topArtists = new ArrayList<>();
+                }
                 List<Artist> artists = new ArrayList<>();
                 JSONArray items = jsonObject.getJSONArray(val);
                 Integer cnt = 0;
+                int rec = (int) (Math.random() * (items.length() - 1));
 
                 for (int i = 0; i < items.length(); i++) {
                     if (limit && cnt == 10) {
@@ -278,7 +282,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     int popularity = item.getInt("popularity");
                     String spotifyId = item.getString("id");
-                    if (i == 0) {
+                    if (i == rec) {
                         topArtist = item.getString("id");
                     }
                     if (!limit) {
@@ -296,7 +300,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     Artist artist = new Artist(name, genres, popularity, spotifyId, images);
-                    artists.add(artist);h
+                    artists.add(artist);
                     cnt++;
                 }
 
