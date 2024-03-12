@@ -324,7 +324,16 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public String toString() {
-                    return "Name: " + name + ", Genres: " + genres + ", Popularity: " + popularity + ", Spotify ID: " + spotifyId + ", Images: " + images;
+                    String g = "";
+                    for (int i = 0; i < genres.size(); i++) {
+                        if (i == genres.size() - 1) {
+                            g += genres.get(i);
+                        } else {
+                            g += (genres.get(i) + ", ");
+                        }
+                    }
+
+                    return "Name:" + name + "\n" + "Genres:" + g;
                 }
             }
 
