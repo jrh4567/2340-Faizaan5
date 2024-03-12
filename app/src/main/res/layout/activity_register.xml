@@ -30,5 +30,13 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp"
         android:text="Register" />
+    <Button
+        android:id="@+id/cancelButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/registerButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="Cancel" />
 
 </RelativeLayout>

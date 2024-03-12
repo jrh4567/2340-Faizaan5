@@ -23,6 +23,7 @@ public class RegisterActivity extends AppCompatActivity {
         passwordEditText = findViewById(R.id.passwordEditText);
 
         Button registerButton = findViewById(R.id.registerButton);
+        Button cancelButton = findViewById(R.id.cancelButton);
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -31,10 +32,16 @@ public class RegisterActivity extends AppCompatActivity {
                     // If registration successful, display a toast and redirect to LoginActivity
                     Toast.makeText(RegisterActivity.this, "Registration successful", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
-                    finish(); // Close RegisterActivity
                 } else {
                     Toast.makeText(RegisterActivity.this, "Registration failed", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+        cancelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
+
             }
         });
     }

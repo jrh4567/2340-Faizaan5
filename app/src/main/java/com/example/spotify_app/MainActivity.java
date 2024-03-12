@@ -334,7 +334,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
 
-                    return "Name:" + name + "\n" + "Genres:" + g;
+                    return "Name:" + name + "\n" + "Genres:" + g + images;
                 }
             }
 
