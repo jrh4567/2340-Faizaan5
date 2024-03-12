@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView tokenTextView, codeTextView, profileTextView, recTextView;
     private String topArtist;
     private ArrayList<String> topArtists = new ArrayList<>();
+    private String timeRange = "short_term"; //change this variable for time range user story
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         // request for top artists or tracks
         final Request requestArtists = new Request.Builder()
-                .url("https://api.spotify.com/v1/me/top/artists") //for {type}, replace with artists or tracks, for more options such as time range, go to https://developer.spotify.com/documentation/web-api/reference/get-users-top-artists-and-tracks
+                .url("https://api.spotify.com/v1/me/top/artists?time_range=" + timeRange) //for {type}, replace with artists or tracks, for more options such as time range, go to https://developer.spotify.com/documentation/web-api/reference/get-users-top-artists-and-tracks
                 .addHeader("Authorization", "Bearer " + mAccessToken)
                 .build();
 
