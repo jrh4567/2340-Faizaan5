@@ -28,6 +28,7 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, android.view.View view, int position, long id) {
                 String selectedTimeRange = parent.getItemAtPosition(position).toString();
+                TimeRange.setTime(selectedTimeRange);
                 // Handle the selected time range
                 Toast.makeText(SettingsActivity.this, "Selected Time Range: " + selectedTimeRange, Toast.LENGTH_SHORT).show();
             }
