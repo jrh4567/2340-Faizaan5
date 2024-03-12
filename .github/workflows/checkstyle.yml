@@ -8,4 +8,4 @@ jobs:
     name: checkstyle
     runs-on: ubuntu-latest
     steps:
-    - run: java -jar ./checkstyle/checkstyle-8.12-all.jar -c ./checkstyle/CS1332-checkstyle.xml ./app/src/main/java/com/example/spotify_app/*.java
+    - run: cd checkstyle && java -jar checkstyle-8.12-all.jar -c CS1332-checkstyle.xml ../app/src/main/java/com/example/spotify_app/*.java
