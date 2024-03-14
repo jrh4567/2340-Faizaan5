@@ -17,6 +17,8 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
         Button backBtn = (Button) findViewById(R.id.back_btn);
+        Button logoutBtn = (Button) findViewById(R.id.logout_btn);
+        Button deleteBtn = (Button) findViewById(R.id.delete_btn);
 
         Spinner timeRangeSpinner = findViewById(R.id.time_range_spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -40,6 +42,15 @@ public class SettingsActivity extends AppCompatActivity {
         });
         backBtn.setOnClickListener((v) -> {
             Intent intent = new Intent(SettingsActivity.this, MainActivity.class);
+            startActivity(intent);
+        });
+        logoutBtn.setOnClickListener((v) -> {
+            Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
+            startActivity(intent);
+        });
+        deleteBtn.setOnClickListener((v) -> {
+            Intent intent = new Intent(SettingsActivity.this, LoginActivity.class);
+            Toast.makeText(SettingsActivity.this, "deleted account", Toast.LENGTH_SHORT).show();
             startActivity(intent);
         });
     }
