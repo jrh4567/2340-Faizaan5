@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         // request for top artists or tracks
         final Request requestArtists = new Request.Builder()
-                .url("https://api.spotify.com/v1/me/top/artists?time_range=" + TimeRange.getTime()) //for {type}, replace with artists or tracks, for more options such as time range, go to https://developer.spotify.com/documentation/web-api/reference/get-users-top-artists-and-tracks
+                .url("https://api.spotify.com/v1/me/top/artists?time_range=" + Data.getTime()) //for {type}, replace with artists or tracks, for more options such as time range, go to https://developer.spotify.com/documentation/web-api/reference/get-users-top-artists-and-tracks
                 .addHeader("Authorization", "Bearer " + mAccessToken)
                 .build();
 
@@ -213,6 +213,7 @@ public class MainActivity extends AppCompatActivity {
                                     .url("https://api.spotify.com/v1/artists/"+ topArtist + "/related-artists")
                                     .addHeader("Authorization", "Bearer " + mAccessToken)
                                     .build();
+                            Data.setData(topArtistsData);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -256,6 +257,7 @@ public class MainActivity extends AppCompatActivity {
                                 builder.append(artist.toString()).append("\n");
                             }
                             final String topArtistsData = builder.toString();
+                            Data.appendData(topArtistsData);
 
                             setTextAsync(topArtistsData, recTextView);
 
