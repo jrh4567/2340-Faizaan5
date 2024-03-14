@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="time_ranges">
+        <item>short_term</item>
+        <item>medium_term</item>
+        <item>long_term</item>
+    </string-array>
+</resources>
