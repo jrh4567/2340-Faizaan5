@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView tokenTextView, codeTextView, profileTextView, recTextView;
     private String topArtist;
     private ArrayList<String> topArtists = new ArrayList<>();
-    private String timeRange = "short_term"; //change this variable for time range user story
+    //private String timeRange = "short_term"; //change this variable for time range user story
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,13 +166,15 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     // Extract JSON response for user profile
                     final JSONObject profileJsonObject = new JSONObject(response.body().string());
+                    Profile userProfile = Profile.fromJson(profileJsonObject);
 
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             // Update UI with user profile data
                             //profileTextView.setText(profileJsonObject.toString());
-                            Data.setData(profileJsonObject.toString());
+                            Data.setData(userProfile.toString());
+                            Data.setProfile(userProfile);
 
                             // Make a second request to get the top artists
                             makeTopArtistsRequest(requestArtists);
@@ -217,6 +219,7 @@ public class MainActivity extends AppCompatActivity {
                                     .addHeader("Authorization", "Bearer " + mAccessToken)
                                     .build();
                             Data.appendData(topArtistsData);
+                            Data.setTopArtists(artists);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
@@ -261,10 +264,16 @@ public class MainActivity extends AppCompatActivity {
                             }
                             final String topArtistsData = builder.toString();
                             Data.appendData(topArtistsData);
+                            Data.setRecArtists(artists);
+                            final Request requestTracks = new Request.Builder()
+                                    .url("https://api.spotify.com/v1/me/top/tracks?time_range=" + Data.getTime())
+                                    .addHeader("Authorization", "Bearer " + mAccessToken)
+                                    .build();
 
                             //setTextAsync(topArtistsData, recTextView);
-                            Intent intent = new Intent(MainActivity.this, WrappedActivity.class);
-                            startActivity(intent);
+                            makeTrackRequest(requestTracks);
+                            //Intent intent = new Intent(MainActivity.this, WrappedActivity.class);
+                            //startActivity(intent);
 
 
                         } catch (JSONException e) {
@@ -275,6 +284,90 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
             }
+            private void makeTrackRequest(Request request) {
+                mCall = mOkHttpClient.newCall(request);
+
+                mCall.enqueue(new Callback() {
+                    @Override
+                    public void onFailure(Call call, IOException e) {
+                        Log.d("HTTP", "Failed to fetch track data: " + e);
+                        Toast.makeText(MainActivity.this, "Failed to fetch track data, watch Logcat for more details",
+                                Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onResponse(Call call, Response response) throws IOException {
+                        try {
+                            // Extract JSON response for top tracks
+                            final JSONObject topArtistsJsonObject = new JSONObject(response.body().string());
+
+                            // Parse JSON for top tracks
+                            List<Track> tracks = parseTracks(topArtistsJsonObject);
+
+                            // Update UI with top artists data
+                            StringBuilder builder = new StringBuilder("Top Songs:\n");
+                            for (Track track : tracks) {
+                                builder.append(track.toString()).append("\n");
+                            }
+                            final String topTracksData = builder.toString();
+                            Data.appendData(topTracksData);
+                            Data.setTracks(tracks);
+
+                            Intent intent = new Intent(MainActivity.this, WrappedActivity.class);
+                            startActivity(intent);
+
+
+                        } catch (JSONException e) {
+                            Log.d("JSON", "Failed to parse tracks data: " + e);
+                            Toast.makeText(MainActivity.this, "Failed to parse tracks data, watch Logcat for more details",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+            // Method to parse JSON data and return a list of Track objects
+            private List<Track> parseTracks(JSONObject jsonObject) throws JSONException {
+                List<Track> tracks = new ArrayList<>();
+                JSONArray items = jsonObject.getJSONArray("items");
+
+                for (int i = 0; i < items.length(); i++) {
+                    JSONObject trackObject = items.getJSONObject(i);
+                    JSONObject albumObject = trackObject.getJSONObject("album");
+                    JSONArray artistsArray = trackObject.getJSONArray("artists");
+
+                    // Get track details
+                    String id = trackObject.getString("id");
+                    String name = trackObject.getString("name");
+                    int trackNumber = trackObject.getInt("track_number");
+                    int popularity = trackObject.getInt("popularity");
+                    boolean isExplicit = trackObject.getBoolean("explicit");
+                    String previewUrl = trackObject.getString("preview_url");
+                    List<String> availableMarkets = new ArrayList<>();
+
+                    // Get album details
+                    String albumName = albumObject.getString("name");
+
+                    // Get artist details
+                    ArrayList<String> artistName = new ArrayList<String>();
+                    for (int j = 0; j < artistsArray.length(); j++) {
+                        JSONObject artistObject = artistsArray.getJSONObject(j);
+                        artistName.add(artistObject.getString("name"));
+                    }
+
+                    // Get available markets
+                    JSONArray availableMarketsArray = trackObject.getJSONArray("available_markets");
+                    for (int k = 0; k < availableMarketsArray.length(); k++) {
+                        availableMarkets.add(availableMarketsArray.getString(k));
+                    }
+
+                    // Create Track object and add to list
+                    Track track = new Track(id, name, albumName, artistName, trackNumber, popularity, isExplicit, previewUrl, availableMarkets);
+                    tracks.add(track);
+                }
+
+                return tracks;
+            }
+
 
             private List<Artist> parseArtists(JSONObject jsonObject, String val, Boolean limit) throws JSONException {
                 if (!limit) {
@@ -322,37 +415,6 @@ public class MainActivity extends AppCompatActivity {
 
                 return artists;
             }
-
-            class Artist {
-                private String name;
-                private List<String> genres;
-                private int popularity;
-                private String spotifyId;
-                private List<String> images;
-
-                public Artist(String name, List<String> genres, int popularity, String spotifyId, List<String> images) {
-                    this.name = name;
-                    this.genres = genres;
-                    this.popularity = popularity;
-                    this.spotifyId = spotifyId;
-                    this.images = images;
-                }
-
-                @Override
-                public String toString() {
-                    String g = "";
-                    for (int i = 0; i < genres.size(); i++) {
-                        if (i == genres.size() - 1) {
-                            g += genres.get(i);
-                        } else {
-                            g += (genres.get(i) + ", ");
-                        }
-                    }
-
-                    return "Name:" + name + "\n" + "Genres:" + g + images;
-                }
-            }
-
         });
     }
 
