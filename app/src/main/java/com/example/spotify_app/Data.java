@@ -5,11 +5,11 @@ import java.util.List;
 public class Data {
     // handle data
     private static String time = "medium_term";
-    private static String displayData = "";
-    private static Profile userProfile;
-    private static List<Artist> topArtists;
-    private static List<Artist> recArtists;
-    private static List<Track> tracks;
+    private static String displayData = ""; //data display in the wrapped activity
+    private static Profile userProfile; //user profile
+    private static List<Artist> topArtists; // top artists
+    private static List<Artist> recArtists; // recommended artists
+    private static List<Track> tracks; // top tracks
     public static void setTime(String t) {
         time = t;
     }
