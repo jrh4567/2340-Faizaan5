@@ -39,7 +39,6 @@ public class Profile {
     public String getCountry() {
         return country;
     }
-
     public String getDisplayName() {
         return displayName;
     }
@@ -170,19 +169,18 @@ public class Profile {
 
     @Override
     public String toString() {
-        return "Profile{" +
-                "country='" + country + '\'' +
-                ", displayName='" + displayName + '\'' +
-                ", email='" + email + '\'' +
+        return "Profile \n" +
+                "country='" + country + '\n' +
+                ", displayName='" + displayName + '\n' +
+                ", email='" + email + '\n' +
                 ", explicitContentFilterEnabled=" + explicitContentFilterEnabled +
                 ", explicitContentFilterLocked=" + explicitContentFilterLocked +
-                ", spotifyUrl='" + spotifyUrl + '\'' +
+                ", spotifyUrl='" + spotifyUrl + '\n' +
                 ", followersTotal=" + followersTotal +
-                ", userId='" + userId + '\'' +
+                ", userId='" + userId + '\n' +
                 ", imagesUrls=" + imagesUrls +
-                ", product='" + product + '\'' +
-                ", type='" + type + '\'' +
-                ", uri='" + uri + '\'' +
-                '}';
+                ", product='" + product + '\n' +
+                ", type='" + type + '\n' +
+                ", uri='" + uri + '\n';
     }
 }
