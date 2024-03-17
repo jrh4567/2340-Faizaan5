@@ -1,6 +1,8 @@
 package com.example.spotify_app;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.app.Activity;
 import android.os.Bundle;
 import android.content.Intent;
 import android.net.Uri;
@@ -169,7 +171,8 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             // Update UI with user profile data
-                            profileTextView.setText(profileJsonObject.toString());
+                            //profileTextView.setText(profileJsonObject.toString());
+                            Data.setData(profileJsonObject.toString());
 
                             // Make a second request to get the top artists
                             makeTopArtistsRequest(requestArtists);
@@ -213,11 +216,11 @@ public class MainActivity extends AppCompatActivity {
                                     .url("https://api.spotify.com/v1/artists/"+ topArtist + "/related-artists")
                                     .addHeader("Authorization", "Bearer " + mAccessToken)
                                     .build();
-                            Data.setData(topArtistsData);
+                            Data.appendData(topArtistsData);
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    profileTextView.append("\n\n" + topArtistsData);
+                                    //profileTextView.append("\n\n" + topArtistsData);
                                     makeRecRequest(requestRecommended);
                                 }
                             });
@@ -259,7 +262,9 @@ public class MainActivity extends AppCompatActivity {
                             final String topArtistsData = builder.toString();
                             Data.appendData(topArtistsData);
 
-                            setTextAsync(topArtistsData, recTextView);
+                            //setTextAsync(topArtistsData, recTextView);
+                            Intent intent = new Intent(MainActivity.this, WrappedActivity.class);
+                            startActivity(intent);
 
 
                         } catch (JSONException e) {
