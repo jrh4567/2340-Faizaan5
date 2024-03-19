@@ -10,6 +10,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+
 public class SettingsActivity extends AppCompatActivity {
 
     @Override
@@ -45,8 +47,10 @@ public class SettingsActivity extends AppCompatActivity {
             startActivity(intent);
         });
         logoutBtn.setOnClickListener((v) -> {
+            FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(SettingsActivity.this, Login.class);
             startActivity(intent);
+            finish();
         });
         deleteBtn.setOnClickListener((v) -> {
             Intent intent = new Intent(SettingsActivity.this, Login.class);
