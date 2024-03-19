@@ -1,0 +1,12 @@
+on:
+  pull_request:
+    branches:
+    - main
+
+jobs:
+  my_job:
+    name: checkstyle
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - run: cd checkstyle && java -jar checkstyle-8.12-all.jar -c CS1332-checkstyle.xml ../app/src/main/java/com/example/spotify_app/*.java
