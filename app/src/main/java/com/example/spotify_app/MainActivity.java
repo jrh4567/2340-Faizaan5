@@ -10,10 +10,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.spotify.sdk.android.auth.AuthorizationClient;
 import com.spotify.sdk.android.auth.AuthorizationRequest;
 import com.spotify.sdk.android.auth.AuthorizationResponse;
@@ -49,6 +52,9 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> topArtists = new ArrayList<>();
     //private String timeRange = "short_term"; //change this variable for time range user story
 
+    FirebaseAuth auth;
+    FirebaseUser user;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +70,11 @@ public class MainActivity extends AppCompatActivity {
         Button tokenBtn = (Button) findViewById(R.id.token_btn);
         Button codeBtn = (Button) findViewById(R.id.code_btn);
         Button profileBtn = (Button) findViewById(R.id.profile_btn);
+        Button logoutBtn = (Button) findViewById(R.id.logoutButton);
+
+        //Initialize firebase info
+        auth = FirebaseAuth.getInstance();
+        user = auth.getCurrentUser();
         Button settingBtn = (Button) findViewById(R.id.setting_btn);
 
         // Set the click listeners for the buttons
@@ -84,6 +95,23 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        //Logout user if they are not logged in
+        if (user == null) {
+            Intent intent = new Intent(getApplicationContext(), Login.class);
+            startActivity(intent);
+            finish();
+    }
+
+        //Logout Button
+        //TODO: fix layout for these buttons
+        logoutBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                FirebaseAuth.getInstance().signOut();
+                Intent intent = new Intent(getApplicationContext(), Login.class);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
 
     /**
